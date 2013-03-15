@@ -364,10 +364,9 @@ function GridIndicatorBar:SetIndicator(indicator, color, text, value, maxValue, 
 	end
 	
 	local state = self.Bar2State
-	self.Bar2Holder:Show()
 	
 	if indicator == "bar2" then
-		state.displayed = true
+		self.Bar2Holder:Show()
 		state.isCooldown = false
 		
 		if value and maxValue then
@@ -387,7 +386,6 @@ function GridIndicatorBar:SetIndicator(indicator, color, text, value, maxValue, 
 			self:UpdateBar2Colors()
 		end
 	elseif indicator == "bar2color" and type(color) == "table" then
-		state.overrideDisplayed = true
 		state.overrideColor = color
 		self:UpdateBar2Colors()
 	end
@@ -405,20 +403,15 @@ function GridIndicatorBar:ClearIndicator(indicator)
 	local state = self.Bar2State
 	
 	if indicator == "bar2" then
-		state.displayed = false
 		state.color = nil
 		state.isCooldown = false
+		self.Bar2Holder:Hide()
 		self:SetBar2(100, 100)
 	elseif indicator == "bar2color" then
-		state.overrideDisplayed = false
 		state.overrideColor = nil
 	end
 	
 	self:UpdateBar2Colors()
-	
-	if not self.Bar2State.displayed and not self.Bar2State.overrideDisplayed then
-		self.Bar2Holder:Hide()
-	end
 end
 
 -------------------------------------------------------------------------------
