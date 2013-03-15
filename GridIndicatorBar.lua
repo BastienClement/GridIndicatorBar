@@ -28,6 +28,7 @@ end
 local GridFrame = Grid:GetModule("GridFrame")
 local GridIndicatorBar = GridFrame:NewModule("GridIndicatorBar")
 local media = LibStub("LibSharedMedia-3.0")
+local LibSmooth = LibStub("LibSmoothStatusBar-1.0", true)
 
 local HORIZONTAL = "HORIZONTAL"
 local VERTICAL   = "VERTICAL"
@@ -213,20 +214,6 @@ local options = {
 			inline = true,
 			order = 30,
 			args = {
-				--[[
-				["smooth"] = {
-					type = "toggle",
-					name = "Smooth",
-					desc = "Smoothly animates the bar",
-					order = 10,
-					get = function()
-						return GridIndicatorBar.db.profile.GridIndicatorBar.smooth
-					end,
-					set = function(_, v)
-						GridIndicatorBar.db.profile.GridIndicatorBar.smooth = v
-					end,
-				},
-				--]]
 				["cdFill"] = {
 					type = "toggle",
 					name = "Fill",
@@ -243,6 +230,22 @@ local options = {
 		}
 	}
 }
+
+if LibSmooth then
+	options.args["fx"].args["smooth"] = {
+		type = "toggle",
+		name = "Smooth",
+		desc = "Smoothly animates the bar",
+		order = 10,
+		get = function()
+			return GridIndicatorBar.db.profile.GridIndicatorBar.smooth
+		end,
+		set = function(_, v)
+			GridIndicatorBar.db.profile.GridIndicatorBar.smooth = v
+			GridFrame:WithAllFrames("SetBar2Smoothing", v)
+		end,
+	}
+end
 
 Grid.options.args["GridIndicatorBar"] = options
 
@@ -347,6 +350,7 @@ function GridIndicatorBar:InitializeFrame(frame)
 	frame:SetBar2Position()
 	frame:SetBar2Orientation(settings.orientation)
 	frame:SetBar2Texture(texture)
+	frame:SetBar2Smoothing(settings.smooth)
 	frame:UpdateBar2Colors(texture)
 end
 
@@ -447,6 +451,15 @@ end
 
 function GridFrame.prototype:SetBar2Texture(texture)
 	self.Bar2:SetStatusBarTexture(texture)
+end
+
+function GridFrame.prototype:SetBar2Smoothing(smoothing)
+	if not LibSmooth then return end
+	if smoothing then
+		LibSmooth:SmoothBar(self.Bar2)
+	else
+		LibSmooth:ResetBar(self.Bar2)
+	end
 end
 
 function GridFrame.prototype:UpdateBar2Colors()

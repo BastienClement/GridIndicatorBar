@@ -2,6 +2,11 @@
 ## Title: GridIndicatorBar
 ## Notes: Additionnal bar indicator for Grid
 ## Dependencies: Grid
+## OptionalDeps: LibSmoothStatusBar-1.0
+
+#@no-lib-strip@
+LibSmoothStatusBar-1.0\LibSmoothStatusBar-1.0.lua
+#@end-no-lib-strip@
 
 GridIndicatorBar.lua
 
