@@ -36,7 +36,7 @@ local VERTICAL   = "VERTICAL"
 GridIndicatorBar.defaultDB = {
 	GridIndicatorBar = {
 		color       = { r = 1, g = 1, b = 1, a = 1 },
-		background  = { r = 0, g = 0, b = 0, a = 0.5 },
+		background  = { r = 0, g = 0, b = 0, a = 0.75 },
 		texture     = "Gradient",
 		orientation = HORIZONTAL,
 		
