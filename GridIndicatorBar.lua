@@ -33,6 +33,8 @@ local LibSmooth = LibStub("LibSmoothStatusBar-1.0", true)
 local HORIZONTAL = "HORIZONTAL"
 local VERTICAL   = "VERTICAL"
 
+local settings
+
 GridIndicatorBar.defaultDB = {
 	GridIndicatorBar = {
 		color       = { r = 1, g = 1, b = 1, a = 1 },
@@ -68,11 +70,11 @@ local options = {
 					order = 1,
 					hasAlpha = true,
 					get = function ()
-						local color = GridIndicatorBar.db.profile.GridIndicatorBar.color
+						local color = settings.color
 						return color.r, color.g, color.b, color.a
 					end,
 					set = function (_, r, g, b, a)
-						local color = GridIndicatorBar.db.profile.GridIndicatorBar.color
+						local color = settings.color
 						color.r = r
 						color.g = g
 						color.b = b
@@ -87,11 +89,11 @@ local options = {
 					order = 2,
 					hasAlpha = true,
 					get = function ()
-						local color = GridIndicatorBar.db.profile.GridIndicatorBar.background
+						local color = settings.background
 						return color.r, color.g, color.b, color.a
 					end,
 					set = function (_, r, g, b, a)
-						local color = GridIndicatorBar.db.profile.GridIndicatorBar.background
+						local color = settings.background
 						color.r = r
 						color.g = g
 						color.b = b
@@ -107,10 +109,10 @@ local options = {
 					dialogControl = "LSM30_Statusbar",
 					order = 10,
 					get = function()
-						return GridIndicatorBar.db.profile.GridIndicatorBar.texture
+						return settings.texture
 					end,
 					set = function(_, v)
-						GridIndicatorBar.db.profile.GridIndicatorBar.texture = v
+						settings.texture = v
 						local texture = media:Fetch("statusbar", v)
 						GridFrame:WithAllFrames("SetBar2Texture", texture)
 					end,
@@ -123,10 +125,10 @@ local options = {
 					values = { VERTICAL = "Vertical", HORIZONTAL = "Horizontal" },
 					order = 11,
 					get = function()
-						return GridIndicatorBar.db.profile.GridIndicatorBar.orientation
+						return settings.orientation
 					end,
 					set = function(_, v)
-						GridIndicatorBar.db.profile.GridIndicatorBar.orientation = v
+						settings.orientation = v
 						GridFrame:WithAllFrames("SetBar2Orientation", v)
 					end,
 				},
@@ -148,10 +150,10 @@ local options = {
 					width = "double",
 					order = 10,
 					get = function()
-						return GridIndicatorBar.db.profile.GridIndicatorBar.width
+						return settings.width
 					end,
 					set = function(_, v)
-						GridIndicatorBar.db.profile.GridIndicatorBar.width = v
+						settings.width = v
 						GridFrame:WithAllFrames("SetBar2Position")
 					end,
 				},
@@ -165,10 +167,10 @@ local options = {
 					width = "double",
 					order = 11,
 					get = function()
-						return GridIndicatorBar.db.profile.GridIndicatorBar.height
+						return settings.height
 					end,
 					set = function(_, v)
-						GridIndicatorBar.db.profile.GridIndicatorBar.height = v
+						settings.height = v
 						GridFrame:WithAllFrames("SetBar2Position")
 					end,
 				},
@@ -182,10 +184,10 @@ local options = {
 					width = "double",
 					order = 20,
 					get = function()
-						return GridIndicatorBar.db.profile.GridIndicatorBar.offsetX
+						return settings.offsetX
 					end,
 					set = function(_, v)
-						GridIndicatorBar.db.profile.GridIndicatorBar.offsetX = v
+						settings.offsetX = v
 						GridFrame:WithAllFrames("SetBar2Position")
 					end,
 				},
@@ -199,10 +201,10 @@ local options = {
 					width = "double",
 					order = 21,
 					get = function()
-						return GridIndicatorBar.db.profile.GridIndicatorBar.offsetY
+						return settings.offsetY
 					end,
 					set = function(_, v)
-						GridIndicatorBar.db.profile.GridIndicatorBar.offsetY = v
+						settings.offsetY = v
 						GridFrame:WithAllFrames("SetBar2Position")
 					end,
 				},
@@ -220,10 +222,10 @@ local options = {
 					desc = "Fills the bar up instead of draining it when used for cooldown display",
 					order = 11,
 					get = function()
-						return GridIndicatorBar.db.profile.GridIndicatorBar.cdFill
+						return settings.cdFill
 					end,
 					set = function(_, v)
-						GridIndicatorBar.db.profile.GridIndicatorBar.cdFill = v
+						settings.cdFill = v
 					end,
 				},
 			}
@@ -238,10 +240,10 @@ if LibSmooth then
 		desc = "Smoothly animates the bar",
 		order = 10,
 		get = function()
-			return GridIndicatorBar.db.profile.GridIndicatorBar.smooth
+			return settings.smooth
 		end,
 		set = function(_, v)
-			GridIndicatorBar.db.profile.GridIndicatorBar.smooth = v
+			settings.smooth = v
 			GridFrame:WithAllFrames("SetBar2Smoothing", v)
 		end,
 	}
@@ -261,6 +263,8 @@ function GridIndicatorBar:OnInitialize()
 	hooksecurefunc(GridFrame, "InitializeFrame", self.InitializeFrame)
 	hooksecurefunc(GridFrame.prototype, "SetIndicator", self.SetIndicator)
 	hooksecurefunc(GridFrame.prototype, "ClearIndicator", self.ClearIndicator)
+
+	settings = GridIndicatorBar.db.profile.GridIndicatorBar
 end
 
 function GridIndicatorBar:OnEnable()
@@ -293,7 +297,7 @@ local function AnimationTick()
 		else
 			local start, duration, now = state.cooldownStart, state.cooldownDuration, GetTime()
 			local val
-			if GridIndicatorBar.db.profile.GridIndicatorBar.cdFill then
+			if settings.cdFill then
 				val = now - start
 			else
 				val = start + duration - now
@@ -322,7 +326,6 @@ end
 -------------------------------------------------------------------------------
 
 function GridIndicatorBar:InitializeFrame(frame)
-	local settings = GridIndicatorBar.db.profile.GridIndicatorBar
 	local texture = media:Fetch("statusbar", settings.texture)
 	
 	frame.Bar2State = {}
@@ -426,7 +429,6 @@ function GridFrame.prototype:SetBar2(value, max)
 end
 
 function GridFrame.prototype:SetBar2Position()
-	local settings = GridIndicatorBar.db.profile.GridIndicatorBar
 	local width, height = settings.width, settings.height
 	
 	self.Bar2Holder:SetPoint("CENTER", self, "CENTER", settings.offsetX, settings.offsetY)
@@ -456,7 +458,6 @@ function GridFrame.prototype:SetBar2Smoothing(smoothing)
 end
 
 function GridFrame.prototype:UpdateBar2Colors()
-	local settings = GridIndicatorBar.db.profile.GridIndicatorBar
 	local state = self.Bar2State
 	local color
 	
