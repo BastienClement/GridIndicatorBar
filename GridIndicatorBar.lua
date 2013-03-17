@@ -31,6 +31,7 @@ local GridIndicatorBar = GridFrame:NewModule("GridIndicatorBar")
 local media = LibStub("LibSharedMedia-3.0")
 local LibSmooth = LibStub("LibSmoothStatusBar-1.0", true)
 
+local ColorTransparent = { r = 0, g = 0, b = 0, a = 0 }
 local settings
 
 GridIndicatorBar.defaultDB = {
@@ -67,11 +68,12 @@ GridIndicatorBar.defaultDB = {
 		textROffset  = 0,
 		textVOffset  = 0,
 		-- Effects
-		smooth       = false,
 		enableCD     = true,
+		cooldownFill = false,
 		textStacks   = true,
 		textStkApnd  = true,
-		cooldownFill = false
+		hideUseless  = false,
+		smooth       = false,
 	}
 }
 
@@ -394,7 +396,7 @@ Grid.options.args["GridIndicatorBar"] = {
 					end,
 					set = function(_, v)
 						settings.textFont = v
-						GridFrame:WithAllFrames("SetBar2Font")
+						GridFrame:WithAllFrames("SetBar2TextFont")
 					end,
 				},
 				["textSize"] = {
@@ -411,7 +413,7 @@ Grid.options.args["GridIndicatorBar"] = {
 					end,
 					set = function(_, v)
 						settings.textSize = v
-						GridFrame:WithAllFrames("SetBar2Font")
+						GridFrame:WithAllFrames("SetBar2TextFont")
 					end,
 				},
 				["textOutline"] = {
@@ -426,7 +428,7 @@ Grid.options.args["GridIndicatorBar"] = {
 					end,
 					set = function(_, v)
 						settings.textOutline = v
-						GridFrame:WithAllFrames("SetBar2Font")
+						GridFrame:WithAllFrames("SetBar2TextFont")
 					end,
 				},
 				["textShadow"] = {
@@ -440,7 +442,7 @@ Grid.options.args["GridIndicatorBar"] = {
 					end,
 					set = function(_, v)
 						settings.textShadow = v
-						GridFrame:WithAllFrames("SetBar2Font")
+						GridFrame:WithAllFrames("SetBar2TextFont")
 					end,
 				},
 				["break3"] = {
@@ -619,11 +621,31 @@ Grid.options.args["GridIndicatorBar"] = {
 					order = 30,
 					name = "",
 				},
+				["hideUseless"] = {
+					type = "toggle",
+					name = "Hide bar if only standalone text is available",
+					desc = "When text is used as a standalone indicator and nothing is displayed from the base indicator and the Show bar options is checked, shows the text but hides the bar.",
+					order = 31,
+					width = "double",
+					disabled = function() return not settings.textEnable or not settings.textAlone or not settings.textShowBar end,
+					get = function()
+						return settings.hideUseless
+					end,
+					set = function(_, v)
+						settings.hideUseless = v
+						GridFrame:WithAllFrames("UpdateBar2", v)
+					end,
+				},
+				["break3"] = {
+					type = "description",
+					order = 40,
+					name = "",
+				},
 				["smooth"] = {
 					type = "toggle",
 					name = "Smooth",
 					desc = "Smoothly animates the bar",
-					order = 31,
+					order = 41,
 					get = function()
 						return settings.smooth
 					end,
@@ -741,7 +763,7 @@ function GridIndicatorBar:InitializeFrame(frame)
 	frame.Bar2:SetValue(100)
 	
 	frame.Bar2Text = frame.Bar2:CreateFontString(nil, "ARTWORK")
-	frame:SetBar2Font()
+	frame:SetBar2TextFont()
 	
 	frame:SetBar2Position()
 	
@@ -861,7 +883,7 @@ function GridFrame.prototype:SetBar2Position()
 	self.Bar2Text:SetPoint("RIGHT", self.Bar2, "RIGHT", -settings.textROffset, settings.textVOffset)
 end
 
-function GridFrame.prototype:SetBar2Font()
+function GridFrame.prototype:SetBar2TextFont()
 	local font = media:Fetch("font", settings.textFont) or STANDARD_TEXT_FONT
 	self.Bar2Text:SetFont(font, settings.textSize, settings.textOutline)
 	self.Bar2Text:SetShadowOffset(0, 0)
@@ -906,10 +928,46 @@ function GridFrame.prototype:UpdateBar2()
 	local state = self.Bar2State
 	local s = settings
 	
+	-- Visibility
+	local display = false
+	local useless = false
+	
+	if state.displayed then
+		display = true
+	elseif state.overrideColor and s.colorAlone and s.colorShowBar then
+		display = true
+	elseif state.overrideText and s.textAlone and s.textShowBar then
+		display = true
+		useless = s.hideUseless
+	end
+	
+	if display ~= state.oldDisplay then
+		state.oldDisplay = display
+		if display then
+			self.Bar2Holder:Show()
+		else
+			self.Bar2Holder:Hide()
+			return
+		end
+	end
+	
+	if useless ~= state.useless then
+		state.useless = useless
+		if useless then
+			self.Bar2Holder:SetBackdropBorderColor(0, 0, 0, 0)
+			self:SetBar2BGColor(ColorTransparent)
+		else
+			self.Bar2Holder:SetBackdropBorderColor(0, 0, 0, 1)
+			self:SetBar2BGColor(s.background)
+		end
+	end
+	
 	-- Color
 	local color
 	
-	if state.overrideColor and s.colorAlone then
+	if useless then
+		color = ColorTransparent
+	elseif state.overrideColor and s.colorAlone then
 		color = state.overrideColor
 	elseif state.color and not (s.colorAlone and s.colorIgnore) then
 		color = state.color
@@ -986,26 +1044,6 @@ function GridFrame.prototype:UpdateBar2()
 		if textColor ~= state.oldTextColor then
 			state.oldTextColor = textColor
 			self.Bar2Text:SetTextColor(textColor.r, textColor.g, textColor.b, textColor.a)
-		end
-	end
-	
-	-- Visibility
-	local display = false
-	
-	if state.displayed then
-		display = true
-	elseif state.overrideColor and s.colorAlone and s.colorShowBar then
-		display = true
-	elseif state.overrideText and s.textAlone and s.textShowBar then
-		display = true
-	end
-	
-	if display ~= state.oldDisplay then
-		state.oldDisplay = display
-		if display then
-			self.Bar2Holder:Show()
-		else
-			self.Bar2Holder:Hide()
 		end
 	end
 end
