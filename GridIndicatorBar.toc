@@ -10,5 +10,5 @@ LibSmoothStatusBar-1.0\LibSmoothStatusBar-1.0.xml
 #@end-no-lib-strip@
 
 GridIndicatorBar.lua
-GridStatusUnitPower.lua
+#GridStatusUnitPower.lua
 
