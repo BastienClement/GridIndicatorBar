@@ -39,6 +39,8 @@ GridStatusUnitPower.defaultDB = {
 		enable = true,
 		range = false,
 		priority = 30,
+		color = { r = 1, g = 1, b = 1, a = 1 },
+		ignorePets = false,
 		types = {
 			[SPELL_POWER_MANA] = {
 				enable = true,
@@ -69,9 +71,69 @@ GridStatusUnitPower.options = false
 
 local settings
 
+local UnitPower_options = {
+	["color"] = false,
+	["ignorePets"] = {
+		type = "toggle",
+		name = "Ignore pets",
+		desc = "Ignore pets power",
+		order = 10,
+		get = function()
+			return settings.ignorePets
+		end,
+		set = function(_, v)
+			settings.ignorePets = v
+			GridStatusUnitPower:UpdateAllUnits()
+		end,
+	},
+	["opacity"] = false,
+}
+
+local i = 100
+for powerT, powerN in pairs(powerTypes) do
+	UnitPower_options[powerN] = {
+		type = "group",
+		name = powerN,
+		inline = true,
+		order = i,
+		args = {
+			["enable"] = {
+				type = "toggle",
+				name = "Enable",
+				desc = "Enable " .. powerN .. " tracking",
+				order = 1,
+				get = function()
+					return settings.types[powerT].enable
+				end,
+				set = function(_, v)
+					settings.types[powerT].enable = v
+					GridStatusUnitPower:UpdateAllUnits()
+				end,
+			},
+			["color"] = {
+				type = "color",
+				name = "Color",
+				desc = powerN .. " color",
+				order = 2,
+				hasAlpha = true,
+				disabled = function() return not settings.types[powerT].enable end,
+				get = function()
+					local color = settings.types[powerT].color
+					return color.r, color.g, color.b, color.a
+				end,
+				set = function(_, r, g, b, a)
+					settings.types[powerT].color = { r = r, g = g, b = b, a = a }
+					GridStatusUnitPower:UpdateAllUnits()
+				end,
+			},
+		}
+	}
+	i = i + 1
+end
+
 function GridStatusUnitPower:OnInitialize()
 	self.super.OnInitialize(self)
-	self:RegisterStatus("unit_power", "Unit Power", nil, true)
+	self:RegisterStatus("unit_power", "Unit Power", UnitPower_options, true)
 	settings = self.db.profile.unit_power
 end
 
@@ -81,6 +143,7 @@ function GridStatusUnitPower:OnStatusEnable(status)
 		self:RegisterEvent("UNIT_DISPLAYPOWER", "UpdateUnit")
 		self:RegisterEvent("UNIT_MAXPOWER", "UpdateUnit")
 		self:RegisterEvent("UNIT_POWER", "UpdateUnit")
+		self:RegisterEvent("UNIT_PORTRAIT_UPDATE", "UpdateUnit") -- Hack to catch range changes
 		self:UpdateAllUnits()
 	end
 end
@@ -94,6 +157,7 @@ function GridStatusUnitPower:OnStatusDisable(status)
 		self:UnregisterEvent("UNIT_DISPLAYPOWER", "UpdateUnit")
 		self:UnregisterEvent("UNIT_MAXPOWER", "UpdateUnit")
 		self:UnregisterEvent("UNIT_POWER", "UpdateUnit")
+		self:UnregisterEvent("UNIT_PORTRAIT_UPDATE", "UpdateUnit")
 	end
 end
 
@@ -117,13 +181,15 @@ function GridStatusUnitPower:UpdateUnit(_, unitid)
 end
 
 function GridStatusUnitPower:UpdateUnitPower(unitid)
+	if not unitid then return end
+	
 	local guid = UnitGUID(unitid)
 	if not guid then return end
 	
 	local powerType = UnitPowerType(unitid)
 	local powerSettings = settings.types[powerType]
 	
-	if powerSettings and powerSettings.enable then
+	if powerSettings and powerSettings.enable and (UnitIsPlayer(unitid) or not settings.ignorePets) then
 		local power, powerMax = UnitPower(unitid), UnitPowerMax(unitid)
 		self.core:SendStatusGained(
 			guid,
