@@ -56,17 +56,16 @@ GridIndicatorBar.defaultDB = {
 		textShowBar  = false,
 		textIgnore   = false,
 		textNoColor  = false,
-		textAutoWrap = true,
-		textWrap     = 0,
 		textFont     = "Friz Quadrata TT",
 		textSize     = 12,
 		textOutline  = "NONE",
 		textShadow   = true,
-		textAlign    = "CENTER",
 		textBarColor = false,
 		textColor    = { r = 1, g = 1, b = 1, a = 1 },
-		textX        = 0,
-		textY        = 0,
+		textAlign    = "CENTER",
+		textLOffset  = 0,
+		textROffset  = 0,
+		textVOffset  = 0,
 		-- Effects
 		smooth       = false,
 		enableCD     = true,
@@ -484,39 +483,69 @@ Grid.options.args["GridIndicatorBar"] = {
 					order = 40,
 					name = "",
 				},
-				["textX"] = {
-					type = "range",
-					name = "X offset",
-					desc = "Horizontal offset",
-					min = -200,
-					max = 200,
-					step = 1,
+				["textAlign"] = {
+					name = "Text align",
+					desc = "Sets text alignment",
 					order = 41,
-					width = "double",
+					type = "select",
+					values = { LEFT = "Left", CENTER = "Center", RIGHT = "Right" },
 					disabled = function() return not settings.textEnable end,
 					get = function()
-						return settings.textX
+						return settings.textAlign
 					end,
 					set = function(_, v)
-						settings.textX = v
+						settings.textAlign = v
 						GridFrame:WithAllFrames("SetBar2Position")
 					end,
 				},
-				["textY"] = {
+				["textLOffset"] = {
 					type = "range",
-					name = "Y offset",
-					desc = "Vertical offset",
-					min = -200,
-					max = 200,
+					name = "Left padding",
+					desc = "Text left padding",
+					min = -100,
+					max = 100,
 					step = 1,
-					order = 42,
-					width = "double",
+					order = 51,
 					disabled = function() return not settings.textEnable end,
 					get = function()
-						return settings.textY
+						return settings.textLOffset
 					end,
 					set = function(_, v)
-						settings.textY = v
+						settings.textLOffset = v
+						GridFrame:WithAllFrames("SetBar2Position")
+					end,
+				},
+				["textROffset"] = {
+					type = "range",
+					name = "Right padding",
+					desc = "Text right padding",
+					min = -100,
+					max = 100,
+					step = 1,
+					order = 52,
+					disabled = function() return not settings.textEnable end,
+					get = function()
+						return settings.textROffset
+					end,
+					set = function(_, v)
+						settings.textROffset = v
+						GridFrame:WithAllFrames("SetBar2Position")
+					end,
+				},
+				["textVOffset"] = {
+					type = "range",
+					name = "Vertical offset",
+					desc = "Text vertical offset",
+					min = -100,
+					max = 100,
+					step = 1,
+					order = 53,
+					disabled = function() return not settings.textEnable end,
+					get = function()
+						return settings.textVOffset
+					end,
+					set = function(_, v)
+						settings.textVOffset = v
 						GridFrame:WithAllFrames("SetBar2Position")
 					end,
 				},
@@ -828,9 +857,8 @@ function GridFrame.prototype:SetBar2Position()
 	self.Bar2:SetHeight(height)
 	
 	self.Bar2Text:SetJustifyH(textAlign)
-	self.Bar2Text:SetPoint(textAlign, self.Bar2, textAlign, settings.textX, settings.textY)
-	self.Bar2Text:SetWidth(width)
-	self.Bar2Text:SetWidth(0)
+	self.Bar2Text:SetPoint("LEFT", self.Bar2, "LEFT", settings.textLOffset, settings.textVOffset)
+	self.Bar2Text:SetPoint("RIGHT", self.Bar2, "RIGHT", -settings.textROffset, settings.textVOffset)
 end
 
 function GridFrame.prototype:SetBar2Font()
