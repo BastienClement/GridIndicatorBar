@@ -1036,7 +1036,7 @@ function GridFrame.prototype:UpdateBar2()
 		if state.overrideTextColor and not s.textNoColor and s.textAlone then
 			textColor = state.overrideTextColor
 		elseif s.textBarColor then
-			textColor = color
+			textColor = useless and s.textColor or color
 		else
 			textColor = s.textColor
 		end
