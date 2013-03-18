@@ -329,6 +329,7 @@ Grid.options.args["GridIndicatorBar"] = {
 					desc = "Dissociate the text indicator from the bar indicator. The bar text indicator will now appear as a standalone indicator.",
 					order = 12,
 					disabled = function() return not settings.textEnable end,
+					hidden = function() return not settings.textEnable end,
 					get = function()
 						return settings.textAlone
 					end,
@@ -344,6 +345,7 @@ Grid.options.args["GridIndicatorBar"] = {
 					desc = "When used as a standalone indicator the text indicator will still show the bar if not already displayed.",
 					order = 13,
 					disabled = function() return not settings.textEnable or not settings.textAlone end,
+					hidden = function() return not settings.textEnable end,
 					get = function()
 						return settings.textShowBar
 					end,
@@ -358,6 +360,7 @@ Grid.options.args["GridIndicatorBar"] = {
 					desc = "When used as a standalone indicator the text indicator will ignore text values from the base indicator instead of working as an overriding indicator.",
 					order = 14,
 					disabled = function() return not settings.textEnable or not settings.textAlone end,
+					hidden = function() return not settings.textEnable end,
 					get = function()
 						return settings.textIgnore
 					end,
@@ -371,7 +374,8 @@ Grid.options.args["GridIndicatorBar"] = {
 					desc = "When used as a standalone indicator the text indicator will ignore color values and follow the settings below.",
 					order = 15,
 					type = "toggle",
-					disabled = function() return not settings.textEnable or not settings.textAlone  end,
+					disabled = function() return not settings.textEnable or not settings.textAlone end,
+					hidden = function() return not settings.textEnable end,
 					get = function()
 						return settings.textNoColor
 					end,
@@ -383,6 +387,7 @@ Grid.options.args["GridIndicatorBar"] = {
 				["break2"] = {
 					type = "description",
 					order = 20,
+					hidden = function() return not settings.textEnable end,
 					name = "",
 				},
 				["textFont"] = {
@@ -393,6 +398,7 @@ Grid.options.args["GridIndicatorBar"] = {
 					values = media:HashTable("font"),
 					dialogControl = "LSM30_Font",
 					disabled = function() return not settings.textEnable end,
+					hidden = function() return not settings.textEnable end,
 					get = function()
 						return settings.textFont
 					end,
@@ -410,6 +416,7 @@ Grid.options.args["GridIndicatorBar"] = {
 					max = 24,
 					step = 1,
 					disabled = function() return not settings.textEnable end,
+					hidden = function() return not settings.textEnable end,
 					get = function()
 						return settings.textSize
 					end,
@@ -425,6 +432,7 @@ Grid.options.args["GridIndicatorBar"] = {
 					type = "select",
 					values = { NONE = "None", OUTLINE = "Thin", THICKOUTLINE = "Thick" },
 					disabled = function() return not settings.textEnable end,
+					hidden = function() return not settings.textEnable end,
 					get = function()
 						return settings.textOutline
 					end,
@@ -439,6 +447,7 @@ Grid.options.args["GridIndicatorBar"] = {
 					order = 24,
 					type = "toggle",
 					disabled = function() return not settings.textEnable end,
+					hidden = function() return not settings.textEnable end,
 					get = function()
 						return settings.textShadow
 					end,
@@ -450,6 +459,7 @@ Grid.options.args["GridIndicatorBar"] = {
 				["break3"] = {
 					type = "description",
 					order = 30,
+					hidden = function() return not settings.textEnable end,
 					name = "",
 				},
 				["textColor"] = {
@@ -459,6 +469,7 @@ Grid.options.args["GridIndicatorBar"] = {
 					order = 31,
 					hasAlpha = true,
 					disabled = function() return not settings.textEnable end,
+					hidden = function() return not settings.textEnable end,
 					get = function ()
 						local color = settings.textColor
 						return color.r, color.g, color.b, color.a
@@ -474,6 +485,7 @@ Grid.options.args["GridIndicatorBar"] = {
 					order = 32,
 					type = "toggle",
 					disabled = function() return not settings.textEnable end,
+					hidden = function() return not settings.textEnable end,
 					get = function()
 						return settings.textBarColor
 					end,
@@ -485,6 +497,7 @@ Grid.options.args["GridIndicatorBar"] = {
 				["break4"] = {
 					type = "description",
 					order = 40,
+					hidden = function() return not settings.textEnable end,
 					name = "",
 				},
 				["textAlign"] = {
@@ -494,6 +507,7 @@ Grid.options.args["GridIndicatorBar"] = {
 					type = "select",
 					values = { LEFT = "Left", CENTER = "Center", RIGHT = "Right" },
 					disabled = function() return not settings.textEnable end,
+					hidden = function() return not settings.textEnable end,
 					get = function()
 						return settings.textAlign
 					end,
@@ -511,6 +525,7 @@ Grid.options.args["GridIndicatorBar"] = {
 					step = 1,
 					order = 51,
 					disabled = function() return not settings.textEnable end,
+					hidden = function() return not settings.textEnable end,
 					get = function()
 						return settings.textLOffset
 					end,
@@ -528,6 +543,7 @@ Grid.options.args["GridIndicatorBar"] = {
 					step = 1,
 					order = 52,
 					disabled = function() return not settings.textEnable end,
+					hidden = function() return not settings.textEnable end,
 					get = function()
 						return settings.textROffset
 					end,
@@ -545,6 +561,7 @@ Grid.options.args["GridIndicatorBar"] = {
 					step = 1,
 					order = 53,
 					disabled = function() return not settings.textEnable end,
+					hidden = function() return not settings.textEnable end,
 					get = function()
 						return settings.textVOffset
 					end,
