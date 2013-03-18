@@ -313,6 +313,8 @@ Grid.options.args["GridIndicatorBar"] = {
 					end,
 					set = function(_, v)
 						settings.textEnable = v
+						settings.textAlone = false
+						GridFrame:UpdateOptionsMenu()
 						GridFrame:WithAllFrames("UpdateBar2")
 					end,
 				},
