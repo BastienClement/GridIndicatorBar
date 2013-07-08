@@ -168,8 +168,8 @@ Grid.options.args["GridIndicatorBar"] = {
 						return color.r, color.g, color.b, color.a
 					end,
 					set = function (_, r, g, b, a)
-						settings.color = { r = r, g = g, b = b, a = a or 1 }
-						GridFrame:WithAllFrames("SetBar2BGColor", color)
+						settings.background = { r = r, g = g, b = b, a = a or 1 }
+						GridFrame:WithAllFrames("SetBar2BGColor", settings.background)
 					end,
 				},
 				["break1"] = {
