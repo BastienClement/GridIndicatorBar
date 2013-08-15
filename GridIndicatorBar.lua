@@ -767,7 +767,7 @@ function GridIndicatorBar:InitializeFrame(frame)
 	frame.Bar2State = {}
 	
 	frame.Bar2Holder = CreateFrame("Frame", nil, frame)
-	frame.Bar2Holder:SetFrameLevel(5)
+	frame.Bar2Holder:SetFrameLevel(50)
 	frame.Bar2Holder:SetBackdrop({
 		bgFile = "Interface\\BUTTONS\\WHITE8X8", tile = true, tileSize = 8,
 		edgeFile = "Interface\\BUTTONS\\WHITE8X8", edgeSize = 1,
