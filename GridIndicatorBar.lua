@@ -51,6 +51,7 @@ GridIndicatorBar.defaultDB = {
 		height       = 6,
 		offsetX      = 0,
 		offsetY      = 0,
+		frameStrata  = 50,
 		-- Text
 		textEnable   = false,
 		textAlone    = false,
@@ -292,6 +293,23 @@ Grid.options.args["GridIndicatorBar"] = {
 					end,
 					set = function(_, v)
 						settings.offsetY = v
+						GridFrame:WithAllFrames("SetBar2Position")
+					end,
+				},
+				["frameStrata"] = {
+					type = "range",
+					name = "Frame Strata",
+					desc = "Level of the bar relative to other indicators",
+					min = -200,
+					max = 200,
+					step = 1,
+					width = "double",
+					order = 22,
+					get = function()
+						return settings.frameStrata
+					end,
+					set = function(_, v)
+						settings.frameStrata = v
 						GridFrame:WithAllFrames("SetBar2Position")
 					end,
 				},
@@ -767,7 +785,6 @@ function GridIndicatorBar:InitializeFrame(frame)
 	frame.Bar2State = {}
 	
 	frame.Bar2Holder = CreateFrame("Frame", nil, frame)
-	frame.Bar2Holder:SetFrameLevel(50)
 	frame.Bar2Holder:SetBackdrop({
 		bgFile = "Interface\\BUTTONS\\WHITE8X8", tile = true, tileSize = 8,
 		edgeFile = "Interface\\BUTTONS\\WHITE8X8", edgeSize = 1,
@@ -888,6 +905,8 @@ end
 function GridFrame.prototype:SetBar2Position()
 	local width, height = settings.width, settings.height
 	local textAlign = settings.textAlign
+	
+	self.Bar2Holder:SetFrameLevel(settings.frameStrata)
 	
 	self.Bar2Holder:SetPoint("CENTER", self, "CENTER", settings.offsetX, settings.offsetY)
 	self.Bar2Holder:SetWidth(width + 2)
