@@ -1,4 +1,4 @@
-## Interface: 50400
+## Interface: 60000
 ## Title: GridIndicatorBar
 ## Notes: Additionnal bar indicator for Grid
 ## Dependencies: Grid
